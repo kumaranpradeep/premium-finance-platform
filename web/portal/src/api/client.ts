@@ -6,6 +6,7 @@ type ProblemDetails = {
   title?: string
   detail?: string
   traceId?: string
+  errors?: Record<string, string[]>
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -25,10 +26,11 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
 
   if (!response.ok) {
     const problem: ProblemDetails = await response.json().catch(() => ({}))
+    const validationMessages = problem.errors ? Object.values(problem.errors).flat().join(' ') : undefined
     throw new ApiError(
       response.status,
       problem.title ?? response.statusText,
-      problem.detail ?? 'Something went wrong. Please try again.',
+      problem.detail ?? validationMessages ?? 'Something went wrong. Please try again.',
       problem.traceId ?? response.headers.get('X-Correlation-Id'),
     )
   }

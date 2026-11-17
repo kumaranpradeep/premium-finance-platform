@@ -2,6 +2,7 @@ using PremiumFinance.Api.Middleware;
 using PremiumFinance.Api.Services;
 using PremiumFinance.Application.Common;
 using PremiumFinance.Infrastructure;
+using PremiumFinance.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("PremiumFinanceDb")!);
+builder.Services.AddApplication();
 string[] allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddCors(cors => cors.AddPolicy("Portal", policy => policy

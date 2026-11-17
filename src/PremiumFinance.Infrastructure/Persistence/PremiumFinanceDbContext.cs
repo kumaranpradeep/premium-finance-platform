@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PremiumFinance.Application.Common;
 using PremiumFinance.Domain.Common;
+using PremiumFinance.Domain.Pricing;
 
 namespace PremiumFinance.Infrastructure.Persistence;
 
@@ -15,6 +16,7 @@ public class PremiumFinanceDbContext : DbContext
         _currentUser = currentUser;
         _clock = clock;
     }
+    public DbSet<RateCardEntry> RateCardEntries => Set<RateCardEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

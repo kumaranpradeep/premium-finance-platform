@@ -5,6 +5,9 @@ export function Layout() {
     <>
       <header>
         <Link to="/">Premium Finance</Link>
+        <nav>
+          <Link to="/quotes">Get a quote</Link>
+        </nav>
       </header>
       <main>
         <Outlet />
