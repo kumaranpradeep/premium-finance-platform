@@ -1,1 +1,10 @@
-/* Global styles for the portal. */
+body { font-family: system-ui, sans-serif; margin: 0; color: #1d1d1f; }
+header { display: flex; gap: 24px; align-items: center; padding: 12px 24px; border-bottom: 1px solid #ddd; }
+main { max-width: 720px; padding: 24px; }
+form { display: grid; gap: 12px; max-width: 320px; }
+label { display: grid; gap: 4px; }
+dl { display: grid; grid-template-columns: max-content auto; gap: 4px 16px; }
+dd { margin: 0; }
+table { border-collapse: collapse; }
+th, td { border: 1px solid #ddd; padding: 4px 12px; text-align: left; }
+[role="alert"] { color: #b00020; }
