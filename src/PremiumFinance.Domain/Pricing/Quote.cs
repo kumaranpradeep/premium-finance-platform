@@ -18,6 +18,7 @@ public class Quote
     public DateOnly StartDate { get; }
     public decimal CreditCharge { get; }
     public decimal TotalPayable { get; }
+    public decimal Apr { get; }
     public IReadOnlyList<QuoteInstalment> Instalments { get; }
 
     private Quote(decimal premium, RateCardEntry rate, DateOnly startDate, decimal creditCharge,
@@ -31,6 +32,7 @@ public class Quote
         CreditCharge = creditCharge;
         TotalPayable = premium + creditCharge;
         Instalments = instalments;
+        Apr = AprCalculator.Calculate(premium, startDate, instalments.Select(i => (i.DueDate, i.Amount)));
     }
 
     public static Quote Create(decimal premium, RateCardEntry rate, DateOnly startDate)

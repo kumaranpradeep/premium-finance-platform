@@ -71,4 +71,34 @@ public class QuoteTests
 
         Assert.Equal("We can finance premiums from £100 to £50,000.", ex.Message);
     }
+        [Fact]
+    public void Apr_is_shown_alongside_the_flat_rate()
+    {
+        // 9.5% flat over 10 months, but the customer repays monthly: APR 18.4%
+        var quote = Quote.Create(1200m, TenAt950, new DateOnly(2026, 11, 17));
+
+        Assert.Equal(18.4m, quote.Apr);
+    }
+
+    [Theory]
+    [InlineData(1000, 12, 19.4)]
+    [InlineData(850, 11, 19.0)]
+    public void Apr_for_other_terms(decimal premium, int instalments, decimal expectedApr)
+    {
+        var rate = instalments == 12 ? TwelveAt990 : ElevenAt975;
+
+        var quote = Quote.Create(premium, rate, new DateOnly(2026, 11, 17));
+
+        Assert.Equal(expectedApr, quote.Apr);
+    }
+
+    [Fact]
+    public void Collecting_earlier_in_the_month_raises_the_apr()
+    {
+        // Same price as the 18.4% case, but starting on the 31st means collections on the 28th:
+        // each payment is a few days earlier, so the customer borrows for slightly less time.
+        var quote = Quote.Create(1200m, TenAt950, new DateOnly(2026, 1, 31));
+
+        Assert.Equal(18.8m, quote.Apr);
+    }
 }
