@@ -12,6 +12,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("PremiumFinanceDb")!);
+string[] allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+builder.Services.AddCors(cors => cors.AddPolicy("Portal", policy => policy
+    .WithOrigins(allowedOrigins)
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .WithExposedHeaders(CorrelationIdMiddleware.HeaderName)));
 
 var app = builder.Build();
 
@@ -25,6 +32,8 @@ if (app.Environment.IsDevelopment() || app.Configuration["Swagger:Enabled"] == "
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("Portal");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
