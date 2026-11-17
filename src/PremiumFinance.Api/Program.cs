@@ -1,10 +1,17 @@
 using PremiumFinance.Api.Middleware;
+using PremiumFinance.Api.Services;
+using PremiumFinance.Application.Common;
+using PremiumFinance.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("PremiumFinanceDb")!);
 
 var app = builder.Build();
 
@@ -16,7 +23,8 @@ if (app.Environment.IsDevelopment() || app.Configuration["Swagger:Enabled"] == "
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 //app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
