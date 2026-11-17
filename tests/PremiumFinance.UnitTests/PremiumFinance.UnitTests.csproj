@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PremiumFinance.Domain\PremiumFinance.Domain.csproj" />
     <ProjectReference Include="..\..\src\PremiumFinance.Application\PremiumFinance.Application.csproj" />
+    <ProjectReference Include="..\..\src\PremiumFinance.Api\PremiumFinance.Api.csproj" />
   </ItemGroup>
 
 </Project>
