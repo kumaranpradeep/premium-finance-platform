@@ -15,9 +15,10 @@ builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Pr
 
 var app = builder.Build();
 
+// Correlation ID first, so every log line after it (including errors) carries the ID.
 app.UseMiddleware<CorrelationIdMiddleware>();
+// Then exception handling, which catches errors from everything after it.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 
 if (app.Environment.IsDevelopment() || app.Configuration["Swagger:Enabled"] == "true")
 {
@@ -25,7 +26,7 @@ if (app.Environment.IsDevelopment() || app.Configuration["Swagger:Enabled"] == "
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
