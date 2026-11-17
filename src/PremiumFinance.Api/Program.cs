@@ -15,16 +15,16 @@ builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Pr
 
 var app = builder.Build();
 
-// First in the pipeline, so it catches exceptions from everything after it.
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 
 if (app.Environment.IsDevelopment() || app.Configuration["Swagger:Enabled"] == "true")
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 //app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
