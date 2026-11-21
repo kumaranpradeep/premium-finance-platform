@@ -3,6 +3,7 @@ using PremiumFinance.Api.Services;
 using PremiumFinance.Application.Common;
 using PremiumFinance.Infrastructure;
 using PremiumFinance.Application;
+using PremiumFinance.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,9 @@ builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("PremiumFinanceDb")!);
 builder.Services.AddApplication();
+// /health: Healthy only if the API is running AND can connect to its database.
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<PremiumFinanceDbContext>("database");
 string[] allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddCors(cors => cors.AddPolicy("Portal", policy => policy
@@ -40,7 +44,7 @@ app.UseCors("Portal");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
+app.MapHealthChecks("/health");
 app.Run();
 
 // Makes Program visible to the integration tests (WebApplicationFactory<Program>).
