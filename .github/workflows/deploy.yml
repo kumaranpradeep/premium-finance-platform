@@ -66,6 +66,7 @@ jobs:
           Invoke-Sqlcmd -ServerInstance "${{ vars.AZURE_SQL_SERVER }}" `
                         -Database "PremiumFinancePlatform" `
                         -AccessToken $token `
+                        -ConnectionTimeout 120 `
                         -InputFile ./migrations.sql
       
       - name: Close SQL firewall for this runner
