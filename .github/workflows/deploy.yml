@@ -38,6 +38,7 @@ jobs:
       - name: Generate migration script
         run: |
           dotnet tool install --global dotnet-ef --version 10.0.*
+          dotnet restore
           dotnet ef migrations script --idempotent \
             --project src/PremiumFinance.Infrastructure \
             --startup-project src/PremiumFinance.Api \
