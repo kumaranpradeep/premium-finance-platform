@@ -45,10 +45,14 @@ jobs:
             --output migrations.sql
 
       - name: Apply migrations to Azure SQL
-        uses: azure/sql-action@v2.3
-        with:
-          connection-string: "Server=tcp:${{ vars.AZURE_SQL_SERVER }},1433;Initial Catalog=PremiumFinancePlatform;Authentication=Active Directory Default;Encrypt=True;"
-          path: ./migrations.sql
+        shell: pwsh
+        run: |
+          $token = az account get-access-token --resource https://database.windows.net/ --query accessToken --output tsv
+          Install-Module SqlServer -Scope CurrentUser -Force -AllowClobber
+          Invoke-Sqlcmd -ServerInstance "${{ vars.AZURE_SQL_SERVER }}" `
+                        -Database "PremiumFinancePlatform" `
+                        -AccessToken $token `
+                        -InputFile ./migrations.sql
 
       # ---- 2. API ----
       - name: Publish API
