@@ -1,0 +1,86 @@
+name: Deploy
+
+on:
+  # Deploy after CI has passed on main.
+  workflow_run:
+    workflows: [ CI ]
+    types: [ completed ]
+    branches: [ main ]
+  # Allows running it manually from the Actions tab.
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # needed to request the GitHub token Azure trusts (OIDC)
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Sign in to Azure (no stored password)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      # ---- 1. Database ----
+      - name: Generate migration script
+        run: |
+          dotnet tool install --global dotnet-ef --version 10.0.*
+          dotnet ef migrations script --idempotent \
+            --project src/PremiumFinance.Infrastructure \
+            --startup-project src/PremiumFinance.Api \
+            --output migrations.sql
+
+      - name: Apply migrations to Azure SQL
+        uses: azure/sql-action@v2.3
+        with:
+          connection-string: "Server=tcp:${{ vars.AZURE_SQL_SERVER }},1433;Initial Catalog=PremiumFinancePlatform;Authentication=Active Directory Default;Encrypt=True;"
+          path: ./migrations.sql
+
+      # ---- 2. API ----
+      - name: Publish API
+        run: dotnet publish src/PremiumFinance.Api --configuration Release --output api-publish
+
+      - name: Deploy API to App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          package: api-publish
+
+      - name: Check the API is healthy
+        run: curl --fail --silent --show-error --retry 12 --retry-delay 10 --retry-all-errors "${{ vars.API_BASE_URL }}/health"
+
+      # ---- 3. Portal ----
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: web/portal/package-lock.json
+
+      - name: Build portal
+        working-directory: web/portal
+        env:
+          VITE_API_BASE_URL: ${{ vars.API_BASE_URL }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy portal to Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.SWA_DEPLOYMENT_TOKEN }}
+          action: upload
+          app_location: web/portal/dist
+          skip_app_build: true
