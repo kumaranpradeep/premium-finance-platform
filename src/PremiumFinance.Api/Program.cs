@@ -4,6 +4,7 @@ using PremiumFinance.Application.Common;
 using PremiumFinance.Infrastructure;
 using PremiumFinance.Application;
 using PremiumFinance.Infrastructure.Persistence;
+using PremiumFinance.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,11 @@ builder.Services.AddCors(cors => cors.AddPolicy("Portal", policy => policy
     .WithExposedHeaders(CorrelationIdMiddleware.HeaderName)));
 
 var app = builder.Build();
+// Create the first Admin if none exists (needs a scope: the seeder uses the DbContext).
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    await scope.ServiceProvider.GetRequiredService<AdminSeeder>().SeedAsync();
+}
 
 // Correlation ID first, so every log line after it (including errors) carries the ID.
 app.UseMiddleware<CorrelationIdMiddleware>();

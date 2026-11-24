@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PremiumFinance.Application.Auth;
 using PremiumFinance.Application.Pricing;
 using PremiumFinance.Infrastructure.Identity;
 using PremiumFinance.Infrastructure.Persistence;
@@ -31,6 +32,9 @@ public static class DependencyInjection
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<PremiumFinanceDbContext>();
+                services.AddScoped<JwtTokenGenerator>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<AdminSeeder>();
 
         return services;
     }
