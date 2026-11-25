@@ -4,6 +4,7 @@ using PremiumFinance.Domain.Common;
 using PremiumFinance.Domain.Pricing;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using PremiumFinance.Infrastructure.Identity;
+using PremiumFinance.Domain.Brokers;
 
 namespace PremiumFinance.Infrastructure.Persistence;
 
@@ -20,6 +21,7 @@ public class PremiumFinanceDbContext : IdentityDbContext<ApplicationUser>
     }
     public DbSet<RateCardEntry> RateCardEntries => Set<RateCardEntry>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Broker> Brokers => Set<Broker>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
