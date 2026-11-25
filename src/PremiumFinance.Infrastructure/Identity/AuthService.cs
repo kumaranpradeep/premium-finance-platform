@@ -147,4 +147,15 @@ public class AuthService : IAuthService
     // SHA-256 is fine here (unlike for passwords): the token is 64 random bytes, so there's nothing to guess.
     private static string Hash(string token) =>
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+    public async Task<AuthUser> GetUserAsync(string userId, CancellationToken cancellationToken)
+    {
+        ApplicationUser? user = await _userManager.FindByIdAsync(userId);
+
+        // Deactivated since the token was issued: treat as signed out.
+        if (user is null || !user.IsActive)
+            throw new UnauthorizedException(InvalidRefreshToken);
+
+        IList<string> roles = await _userManager.GetRolesAsync(user);
+        return new AuthUser(user.Id, user.Email!, user.FullName, roles.ToList());
+    }
 }

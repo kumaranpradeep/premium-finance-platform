@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PremiumFinance.Application.Auth;
 using PremiumFinance.Application.Pricing;
+using PremiumFinance.Application.Users;
 using PremiumFinance.Infrastructure.Identity;
 using PremiumFinance.Infrastructure.Persistence;
 using PremiumFinance.Infrastructure.Persistence.Repositories;
@@ -35,6 +36,7 @@ public static class DependencyInjection
                 services.AddScoped<JwtTokenGenerator>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<AdminSeeder>();
+        services.AddScoped<IUserAdminService, UserAdminService>();
 
         return services;
     }
