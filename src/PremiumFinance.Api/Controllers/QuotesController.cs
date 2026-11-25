@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PremiumFinance.Application.Common;
 using PremiumFinance.Application.Quotes;
 
 namespace PremiumFinance.Api.Controllers;
 
 [ApiController]
 [Route("api/quotes")]
+[Authorize(Roles = $"{Roles.Broker},{Roles.Agent},{Roles.TeamLeader}")]
 public class QuotesController : ControllerBase
 {
     private readonly QuoteService _quotes;

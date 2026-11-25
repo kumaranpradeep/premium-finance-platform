@@ -33,6 +33,7 @@ public class ExceptionHandlingMiddleware
         {
             NotFoundException     => (StatusCodes.Status404NotFound, "Not found"),
             ConflictException     => (StatusCodes.Status409Conflict, "Conflict"),
+            UnauthorizedException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             BusinessRuleException => (StatusCodes.Status422UnprocessableEntity, "Business rule violated"),
             _                     => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
         };

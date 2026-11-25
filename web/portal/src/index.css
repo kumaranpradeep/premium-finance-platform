@@ -8,3 +8,5 @@ dd { margin: 0; }
 table { border-collapse: collapse; }
 th, td { border: 1px solid #ddd; padding: 4px 12px; text-align: left; }
 [role="alert"] { color: #b00020; }
+header nav { display: flex; gap: 16px; }
+.user { margin-left: auto; display: flex; gap: 12px; align-items: center; }

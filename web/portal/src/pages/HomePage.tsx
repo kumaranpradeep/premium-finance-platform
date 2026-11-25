@@ -1,3 +1,7 @@
+import { useAuth } from '../auth/useAuth'
+
 export function HomePage() {
-  return <h1>Welcome to Premium Finance</h1>
+  const { state } = useAuth()
+  const name = state.status === 'signedIn' ? state.user.fullName : ''
+  return <h1>Welcome, {name}</h1>
 }

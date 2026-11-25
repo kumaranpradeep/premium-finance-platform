@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using PremiumFinance.Application.Common;
 using PremiumFinance.Domain.Common;
 using PremiumFinance.Domain.Pricing;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using PremiumFinance.Infrastructure.Identity;
 
 namespace PremiumFinance.Infrastructure.Persistence;
 
-public class PremiumFinanceDbContext : DbContext
+public class PremiumFinanceDbContext : IdentityDbContext<ApplicationUser>
 {
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _clock;
@@ -17,9 +19,13 @@ public class PremiumFinanceDbContext : DbContext
         _clock = clock;
     }
     public DbSet<RateCardEntry> RateCardEntries => Set<RateCardEntry>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Identity's own tables and keys (AspNetUsers, AspNetRoles...). Must come first.
+        base.OnModelCreating(modelBuilder);
+
         // Each entity gets its own IEntityTypeConfiguration class in this assembly; picked up automatically.
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PremiumFinanceDbContext).Assembly);
     }
