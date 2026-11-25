@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PremiumFinance.Application.Auth;
+using PremiumFinance.Application.Brokers;
 using PremiumFinance.Application.Pricing;
 using PremiumFinance.Application.Users;
 using PremiumFinance.Infrastructure.Identity;
@@ -37,7 +38,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<AdminSeeder>();
         services.AddScoped<IUserAdminService, UserAdminService>();
-
+        services.AddScoped<IBrokerRepository, BrokerRepository>();
         return services;
     }
 }
